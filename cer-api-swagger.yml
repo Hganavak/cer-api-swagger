@@ -1,0 +1,392 @@
+#######################################
+# Created by Sam Kavanagh 03/07/2018  #
+# Center for eResearch                #
+# s.kavanagh@auckland.ac.nz           #
+#######################################
+
+openapi: 3.0.0
+info:
+  title: Centre for eResearch API
+  description: Centre for eResearch services API
+  version: "0.1.0"
+  contact:
+    email: s.kavanagh@auckland.ac.nz
+
+servers: 
+  - url: http://cer-api.cer.auckland.ac.nz/v0/
+  
+
+paths:
+  /project/person/{person_id}/projects/:
+    get:
+      summary: Returns a list of associated projects ids.
+      description: Returns a list of project_ids associated with a particular person_id.
+      tags:
+        - Project Database
+      parameters:
+        - name: person_id
+          in: path
+          required: true
+          description: The id of a user
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                example:
+                  - 'res12345'
+                  - 'cer12346'
+                  - 'bsp36912'
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to access this  users project list.
+        '404':
+          description: A user with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+          
+  /project/findByCode/{project_code}:
+    get:
+      summary: Get existing project by code.
+      description: Returns project details, associated users, and services/resources.
+      tags:
+        - Project Database
+      parameters:
+        - name: project_code
+          in: path
+          required: true
+          description: The code of a project
+          schema:
+            type : string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to access this project.
+        '404':
+          description: A project with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+    delete:
+      summary: Delete existing project by code.
+      description: Deletes an existing project with a given project code.
+      tags:
+        - Project Database
+      parameters:
+        - name: project_code
+          in: path
+          required: true
+          description: The code of a project.
+          schema:
+            type : string
+      responses: 
+        '204':
+          description: No content.
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to delete this project.
+        '404':
+          description: A project with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+          
+  /project/{project_code}/member/{member_id}:
+    post:
+      summary: Add member to project.
+      description: Adds a user with member_id to project with project_code.
+      tags:
+        - Project Database
+      parameters:
+        - name: project_code
+          in: path
+          required: true
+          description: The code of a project.
+          schema:
+            type: string
+        - name: member_id
+          in: path
+          required: true
+          description: A users member_id in the project database.
+          schema:
+            type: string
+      responses: 
+        '201':
+          description: Created.
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to access this project.
+        '404':
+          description: A project with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+    delete:
+      summary: Remove existing project member.
+      description: Removes a user with member_id from project with project_code.
+      tags:
+        - Project Database
+      parameters:
+        - name: project_code
+          in: path
+          required: true
+          description: The code of a project.
+          schema:
+            type: string
+        - name: member_id
+          in: path
+          required: true
+          description: A users member_id in the project database.
+          schema:
+            type: string
+      responses: 
+        '204':
+          description: No content.
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to access this project.
+        '404':
+          description: A project with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+
+# Grouper
+  /grouper/projectServiceGroupMembers/{project_code}/{group_id}:
+    get:
+      summary: Returns a list of associated users.
+      description: Returns a list of users associated with a particular project service/resource Grouper group.
+      tags:
+        - Grouper
+      parameters:
+        - name: project_code
+          in: path
+          required: true
+          description: The code of a project.
+          schema:
+            type : string
+        - name: group_id
+          in: path
+          required: true
+          description: The name of project service/resource Grouper group.
+          schema:
+            type: string
+      responses: 
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+                example:
+                  - '1593493'
+                  - '1578879'
+                  - '7892546'
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to access this group.
+        '404':
+          description: A group with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+    post:
+      summary: Add a user to a project group.
+      description: Add a user to the list of users associated with a particular project service/resource Grouper group.
+      tags:
+        - Grouper
+      parameters:
+        - name: project_code
+          in: path
+          required: true
+          description: The code of a project.
+          schema:
+            type : string
+        - name: group_id
+          in: path
+          required: true
+          description: The name of project service/resource Grouper group.
+          schema:
+            type: string
+      responses: 
+        '201':
+          description: Created.
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to access this group.
+        '404':
+          description: A group with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+    delete:
+      summary: Delete a user from a project group.
+      description: Delete a user from the list of users associated with a particular project service/resource Grouper group.
+      tags:
+        - Grouper
+      parameters:
+        - name: project_code
+          in: path
+          required: true
+          description: The code of a project.
+          schema:
+            type : string
+        - name: group_id
+          in: path
+          required: true
+          description: The name of project service/resource Grouper group.
+          schema:
+            type: string
+      responses: 
+        '204':
+          description: No content.
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to access this group.
+        '404':
+          description: A group with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+          
+# Services
+  /service/serviceNow/{request_type}/{user_id}:
+    post:
+      summary: Make a new ServiceNow request.
+      description: Make a new request to ServiceNow.
+      tags:
+        - ServiceNow
+      parameters:
+        - name: request_type
+          in: path
+          required: true
+          description: The code of the request type.
+          schema:
+            type : string
+        - name: user_id
+          in: path
+          required: true
+          description: The id of the user making the ServiceNow request.
+          schema:
+            type: string
+      responses: 
+        '201':
+          description: Created.
+        '400':
+          description: Bad request.
+        '401':
+          description: Authorization information is missing or invalid.
+        '403':
+          description: Forbidden. You do not have permission to make this request.
+        '404':
+          description: A request type or user with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
+      
+
+###################################  
+
+tags:
+  - name: Project Database
+  - name: Grouper
+  - name: ServiceNow
+
+###################################
+
+components:
+  schemas:
+    Project:
+      description: An overview of the project details, associated users, and resources/services.
+      type: object
+      properties:
+        id:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectMember'
+        services:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectService'
+            
+    ProjectMember:
+      description: A member of a project in the Project Database.
+      type: object
+      properties:
+        id:
+          type: integer
+        projectMemberId:
+          type: integer
+        uoaId:
+          type: integer
+        fullName:
+          type: string
+        email:
+          type: string
+      
+    ProjectService:
+      description: A service/resource associated with a project in the Project Database.  Generic format used by all service/resource types.
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        accessLevels:
+          type: array
+          items:
+            $ref: '#/components/schemas/GrouperAccessLevel'
+            
+    GrouperAccessLevel:
+      description: A Grouper access level and the list of users belonging to it.
+      type: object
+      properties:
+        grouperGroupId:
+          type: string
+        name:
+          type: string
+        groupMembers:
+          description: List of UoA IDs of associated group members
+          type: array
+          items:
+            type: integer
